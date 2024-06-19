@@ -75,7 +75,7 @@ public class WorldHandler : MonoBehaviour {
 
     private void GenerateGrid() {
         float[,] noiseMap = new float[size, size];
-        (float xOffset, float yOffset) = (UnityEngine.Random.Range(-10000f, 10000f), UnityEngine.Random.Range(-10000f, 10000f));
+        (float xOffset, float yOffset) = (Random.Range(-10000f, 10000f), Random.Range(-10000f, 10000f));
         for (int y = 0; y < size; y++) {
             for (int x = 0; x < size; x++) {
                 float noiseValue = Mathf.PerlinNoise(x * scale + xOffset, y * scale + yOffset);
@@ -409,7 +409,12 @@ public class WorldHandler : MonoBehaviour {
 
 //Make a super class called Cell, make the other cells inherit Cell class, and win?
 public class Cell {
-    public enum Type { None }
+    public enum Type {
+        None, Land, Water, UpperEdge, LowerEdge, LeftEdge, RightEdge, UpperLeftCorner, LowerLeftCorner, UpperRightCorner, LowerRightCorner, UpperLeftInverseCorner, LowerLeftInverseCorner, UpperRightInverseCorner, LowerRightInverseCorner, UpperLeftAndLowerRightCorner, LowerLeftAndUpperRightCorner,
+        Soil,
+        Temp
+    }
+
     public Type type;
     public (int, int) position;
 
@@ -439,59 +444,22 @@ public class Cell {
     }
 }
 
-public class GroundCell {
-    public enum Type { Land, Water, UpperEdge, LowerEdge, LeftEdge, RightEdge, UpperLeftCorner, LowerLeftCorner, UpperRightCorner, LowerRightCorner, UpperLeftInverseCorner, LowerLeftInverseCorner, UpperRightInverseCorner, LowerRightInverseCorner, UpperLeftAndLowerRightCorner, LowerLeftAndUpperRightCorner }
-    public Type type;
-    public (int, int) position;
-
-    public GroundCell() { type = Type.Land; }
-    public GroundCell(Type type) { this.type = type; }
-
-    public bool IsType(Type referenceType) => type == referenceType;
-
-    //Returns an array of bools representing all nearby cells and whether they are the type that the parameter method determines. (STARTS FROM THE UPPER-LEFT, MOVES LEFT TO RIGHT, DESCENDING ROWS, EXCLUDING CENTER)
-    public bool[] NearbyTileTypes(GroundCell[,] grid, Type type) {
-        bool[] nearbyTileTypes = new bool[8];
-        nearbyTileTypes[0] = grid[position.Item1 - 1, position.Item2 + 1].type == type;
-        nearbyTileTypes[1] = grid[position.Item1 + 0, position.Item2 + 1].type == type;
-        nearbyTileTypes[2] = grid[position.Item1 + 1, position.Item2 + 1].type == type;
-        nearbyTileTypes[3] = grid[position.Item1 - 1, position.Item2 + 0].type == type;
-        nearbyTileTypes[4] = grid[position.Item1 + 1, position.Item2 + 0].type == type;
-        nearbyTileTypes[5] = grid[position.Item1 - 1, position.Item2 - 1].type == type;
-        nearbyTileTypes[6] = grid[position.Item1 + 0, position.Item2 - 1].type == type;
-        nearbyTileTypes[7] = grid[position.Item1 + 1, position.Item2 - 1].type == type;
-        return nearbyTileTypes;
-    }
-    //Returns if all nearby tiles are of a certain type, or if any nearby tiles are of a certain type, based on the default bool parameter checkAllTiles.
-    public bool NearbyTileTypeDetected(GroundCell[,] grid, Type type, bool checkAllTiles = false) {
-        if (checkAllTiles) return WorldHandler.CompareBoolArrays(NearbyTileTypes(grid, type), new bool[] { true, true, true, true, true, true, true, true });
-        return !WorldHandler.CompareBoolArrays(NearbyTileTypes(grid, type), new bool[] { false, false, false, false, false, false, false, false });
-    }
+public class GroundCell : Cell {
+    public GroundCell() : base(Type.Land) {}
+    public GroundCell(Type type) : base(type) {}
 }
 
-public class SoilCell {
-    public enum Type { None, Soil }
-    public Type type;
-    public (int, int) position;
-
-    public SoilCell() { type = Type.None; }
-    public SoilCell(Type type) { this.type = type; }
-
-    public bool IsType(Type referenceType) => type == referenceType;
+public class SoilCell : Cell {
+    public SoilCell() : base(Type.None) { }
+    public SoilCell(Type type) : base(type) { }
 }
 
-public class PlantCell {
-    public enum Type { None, Temp }
-    public Type type;
-    public (int, int) position;
-
+public class PlantCell : Cell {
     public int growthStage = 0;
     public string spriteName = null;
 
-    public PlantCell() { type = Type.None; }
-    public PlantCell(Type type) { this.type = type; }
-
-    public bool IsType(Type referenceType) => type == referenceType;
+    public PlantCell() : base(Type.None) { }
+    public PlantCell(Type type) : base(type) { }
 
     public void PlantSeed(string spriteName) {
         if (growthStage != 0) return;
