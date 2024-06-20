@@ -78,19 +78,19 @@ public class PlayerHandler : MonoBehaviour {
             chopCooldown += 0.5f;
         }
         //Fill Empty Bucket
-        else if (IsHoldingItem("WoodBucket (Empty)") && IsFacingGroundTile(GroundCell.Type.Water)) {
+        else if (IsHoldingItem("WoodBucket (Empty)") && IsFacingTile(WorldHandler.instance.groundGrid, GroundCell.Type.Water)) {
             inventory.RemoveItem(InventoryUI.instance.selectedSlot);
             inventory.AddItem(AssetFinder.FindPrefabByObjectName("WoodBucket (Water)").GetComponent<Collectable>());
         }
         //Till Ground
-        else if (IsHoldingItemType("Hoe") && IsStandingOnGroundTile(GroundCell.Type.Land)) {
+        else if (IsHoldingItemType("Hoe") && IsStandingOnTile(WorldHandler.instance.groundGrid, GroundCell.Type.Land)) {
             Vector3 standingPos = new(transform.position.x, transform.position.y - 1f, transform.position.z);
             int cellPosX = WorldHandler.instance.WorldPosToCellPos(standingPos).x;
             int cellPosY = WorldHandler.instance.WorldPosToCellPos(standingPos).y;
             WorldHandler.instance.AddSoilPlot(cellPosX, cellPosY);
         }
         //Plant Seed
-        else if (IsHoldingItemType("Seed") && IsStandingOnSoilTile(SoilCell.Type.Soil) && IsStandingOnPlantTile(PlantCell.Type.None)) {
+        else if (IsHoldingItemType("Seed") && IsStandingOnTile(WorldHandler.instance.soilGrid, SoilCell.Type.Soil) && IsStandingOnTile(WorldHandler.instance.plantGrid, PlantCell.Type.None)) {
             string spriteName = InventoryUI.instance.SelectedInventoryObject().GetComponent<Collectable>().itemSO.icon.name;
             Vector3 standingPos = new(transform.position.x, transform.position.y - 1f, transform.position.z);
             int cellPosX = WorldHandler.instance.WorldPosToCellPos(standingPos).x;
@@ -100,7 +100,7 @@ public class PlayerHandler : MonoBehaviour {
             inventory.RemoveItem(InventoryUI.instance.selectedSlot);
         }
         //Harvest Plant
-        else if (IsStandingOnSoilTile(SoilCell.Type.Soil) && !IsStandingOnPlantTile(PlantCell.Type.None)) {
+        else if (IsStandingOnTile(WorldHandler.instance.soilGrid, SoilCell.Type.Soil) && !IsStandingOnTile(WorldHandler.instance.plantGrid, PlantCell.Type.None)) {
             Vector3 standingPos = new(transform.position.x, transform.position.y - 1f, transform.position.z);
             int cellPosX = WorldHandler.instance.WorldPosToCellPos(standingPos).x;
             int cellPosY = WorldHandler.instance.WorldPosToCellPos(standingPos).y;
@@ -120,36 +120,16 @@ public class PlayerHandler : MonoBehaviour {
         }
     }
 
-    private bool IsStandingOnGroundTile(GroundCell.Type tileForDetection) {
+    private bool IsStandingOnTile(Cell[,] grid, Cell.Type tileForDetection) {
         Vector3 detectorPos = new(transform.position.x, transform.position.y - 1f, 0f);
         Vector3Int cellPos = WorldHandler.instance.WorldPosToCellPos(detectorPos);
-        return WorldHandler.instance.CheckGroundCellAtPos(cellPos.x, cellPos.y, tileForDetection);
-    }
-    private bool IsStandingOnSoilTile(SoilCell.Type tileForDetection) {
-        Vector3 detectorPos = new(transform.position.x, transform.position.y - 1f, 0f);
-        Vector3Int cellPos = WorldHandler.instance.WorldPosToCellPos(detectorPos);
-        return WorldHandler.instance.CheckSoilCellAtPos(cellPos.x, cellPos.y, tileForDetection);
-    }
-    private bool IsStandingOnPlantTile(PlantCell.Type tileForDetection) {
-        Vector3 detectorPos = new(transform.position.x, transform.position.y - 1f, 0f);
-        Vector3Int cellPos = WorldHandler.instance.WorldPosToCellPos(detectorPos);
-        return WorldHandler.instance.CheckPlantCellAtPos(cellPos.x, cellPos.y, tileForDetection);
+        return WorldHandler.instance.CheckCellAtPos(grid, cellPos.x, cellPos.y, tileForDetection);
     }
 
-    private bool IsFacingGroundTile(GroundCell.Type tileForDetection) {
+    private bool IsFacingTile(Cell[,] grid, Cell.Type tileForDetection) {
         Vector3 detectorPos = new(transform.position.x + (animator.GetFloat("horizontal") * 1.5f), transform.position.y + (animator.GetFloat("vertical") * 1.5f) - 1f, 0f);
         Vector3Int cellPos = WorldHandler.instance.WorldPosToCellPos(detectorPos);
-        return WorldHandler.instance.CheckGroundCellAtPos(cellPos.x, cellPos.y, tileForDetection);
-    }
-    private bool IsFacingSoilTile(SoilCell.Type tileForDetection) {
-        Vector3 detectorPos = new(transform.position.x + (animator.GetFloat("horizontal") * 1.5f), transform.position.y + (animator.GetFloat("vertical") * 1.5f) - 1f, 0f);
-        Vector3Int cellPos = WorldHandler.instance.WorldPosToCellPos(detectorPos);
-        return WorldHandler.instance.CheckSoilCellAtPos(cellPos.x, cellPos.y, tileForDetection);
-    }
-    private bool IsFacingPlantTile(PlantCell.Type tileForDetection) {
-        Vector3 detectorPos = new(transform.position.x + (animator.GetFloat("horizontal") * 1.5f), transform.position.y + (animator.GetFloat("vertical") * 1.5f) - 1f, 0f);
-        Vector3Int cellPos = WorldHandler.instance.WorldPosToCellPos(detectorPos);
-        return WorldHandler.instance.CheckPlantCellAtPos(cellPos.x, cellPos.y, tileForDetection);
+        return WorldHandler.instance.CheckCellAtPos(grid, cellPos.x, cellPos.y, tileForDetection);
     }
 
     private bool IsHoldingItem(string item) { return InventoryUI.instance.SelectedInventoryObject() != null && InventoryUI.instance.SelectedInventoryObject().name.Equals(item); }
