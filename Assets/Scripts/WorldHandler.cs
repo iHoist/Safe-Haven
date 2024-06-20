@@ -162,13 +162,20 @@ public class WorldHandler : MonoBehaviour {
         {
             for (int x = 0; x < size; x++)
             {
-                if ((x < size / 2 - safetySize / 2 || x > size / 2 + safetySize / 2 - 1) && (y < size / 2 - safetySize / 2 || y > size / 2 + safetySize / 2 - 1))
+                if (!(x >= size / 2 - safetySize / 2 && x <= size / 2 + safetySize / 2 - 1 && y >= size / 2 - safetySize / 2 && y <= size / 2 + safetySize / 2 - 1))
                 {
                     float noiseValue = noiseMap[x, y];
                     noiseValue -= falloffMap[x, y];
                     GroundCell cell = new() { position = (x, y) };
                     if (noiseValue < waterLevel) cell.type = GroundCell.Type.Water;
                     groundGrid[x, y] = cell;
+                }
+                else
+                {
+                    if (!groundGrid[x, y].IsType(GroundCell.Type.Water))
+                    {
+                        groundGrid[x, y].type = GroundCell.Type.Land;
+                    }
                 }
             }
         }
@@ -178,7 +185,7 @@ public class WorldHandler : MonoBehaviour {
         {
             for (int x = 0; x < size; x++)
             {
-                if ((x < size / 2 - safetySize / 2 || x > size / 2 + safetySize / 2 - 1) && (y < size / 2 - safetySize / 2 || y > size / 2 + safetySize / 2 - 1))
+                if (!(x >= size / 2 - safetySize / 2 && x <= size / 2 + safetySize / 2 - 1 && y >= size / 2 - safetySize / 2 && y <= size / 2 + safetySize / 2 - 1))
                 {
                     SoilCell cell = new() { position = (x, y) }; soilGrid[x, y] = cell;
                 }
@@ -190,7 +197,7 @@ public class WorldHandler : MonoBehaviour {
         {
             for (int x = 0; x < size; x++)
             {
-                if ((x < size / 2 - safetySize / 2 || x > size / 2 + safetySize / 2 - 1) && (y < size / 2 - safetySize / 2 || y > size / 2 + safetySize / 2 - 1))
+                if (!(x >= size / 2 - safetySize / 2 && x <= size / 2 + safetySize / 2 - 1 && y >= size / 2 - safetySize / 2 && y <= size / 2 + safetySize / 2 - 1))
                 {
                     PlantCell cell = new() { position = (x, y) }; plantGrid[x, y] = cell;
                 }
@@ -202,12 +209,8 @@ public class WorldHandler : MonoBehaviour {
         for (int y = 0; y < size; y++) {
             for (int x = 0; x < size; x++) {
                 GroundCell cell = groundGrid[x, y];
-                if (x >= size / 2 - safetySize / 2 && x < size / 2 + safetySize / 2 && y >= size / 2 - safetySize / 2 && y < size / 2 + safetySize / 2) {
-                    groundGrid[x, y].type = GroundCell.Type.Land; groundTilemap.SetTile(new Vector3Int(x, y), landTile);
-                } else {
-                    if (cell.type == GroundCell.Type.Water) groundTilemap.SetTile(new Vector3Int(x, y), waterTile);
-                    else groundTilemap.SetTile(new Vector3Int(x, y), landTile);
-                }
+                if (cell.type == GroundCell.Type.Water) groundTilemap.SetTile(new Vector3Int(x, y), waterTile);
+                else groundTilemap.SetTile(new Vector3Int(x, y), landTile);
             }
         }
     }
