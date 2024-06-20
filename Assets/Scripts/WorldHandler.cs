@@ -412,6 +412,7 @@ public class WorldHandler : MonoBehaviour {
     }
 
     private void GenerateTrees() {
+        //Creates a Noise Map for New Trees
         float[,] noiseMap = new float[size, size];
         (float xOffset, float yOffset) = (Random.Range(-10000f, 10000f), Random.Range(-10000f, 10000f));
         for (int y = 0; y < size; y++)
@@ -423,11 +424,13 @@ public class WorldHandler : MonoBehaviour {
             }
         }
 
+        //Destroys All Previous Trees
         foreach (Transform child in treeManager.transform)
         {
             Destroy(child.gameObject);
         }
 
+        //Initializes New Trees
         for (int y = 1; y < size - 1; y++)
         {
             for (int x = 1; x < size - 1; x++)
@@ -458,10 +461,12 @@ public class WorldHandler : MonoBehaviour {
             }
         }
 
+        //Adjusts Position of New Trees
         foreach (Transform tree in treeManager.transform) tree.position += new Vector3(0.5f, 1f, 0f);
     }
 
     private void GenerateTreesAroundSafeZone() {
+        //Creates a Noise Map for New Trees
         float[,] noiseMap = new float[size, size];
         (float xOffset, float yOffset) = (Random.Range(-10000f, 10000f), Random.Range(-10000f, 10000f));
         for (int y = 0; y < size; y++) {
@@ -471,6 +476,7 @@ public class WorldHandler : MonoBehaviour {
             }
         }
 
+        //Destroys All Previous Trees
         foreach (Transform child in treeManager.transform)
         {
             Destroy(child.gameObject);
@@ -487,7 +493,7 @@ public class WorldHandler : MonoBehaviour {
             }
         }*/
 
-
+        //Initializes New Trees
         for (int y = 1; y < size - 1; y++) {
             for (int x = 1; x < size - 1; x++) {
                 if ((x < 45 || x > 54) && (y < 45 || y > 54)) {
@@ -518,6 +524,7 @@ public class WorldHandler : MonoBehaviour {
             }
         }
 
+        //Adjusts Position of New Trees
         foreach (Transform tree in treeManager.transform) tree.position += new Vector3(0.5f, 1f, 0f);
     }
 
@@ -561,7 +568,6 @@ public class WorldHandler : MonoBehaviour {
     }
 }
 
-//Make a super class called Cell, make the other cells inherit Cell class, and win?
 public class Cell {
     public enum Type {
         None, Land, Water, UpperEdge, LowerEdge, LeftEdge, RightEdge, UpperLeftCorner, LowerLeftCorner, UpperRightCorner, LowerRightCorner, UpperLeftInverseCorner, LowerLeftInverseCorner, UpperRightInverseCorner, LowerRightInverseCorner, UpperLeftAndLowerRightCorner, LowerLeftAndUpperRightCorner,
@@ -637,5 +643,3 @@ public class PlantCell : Cell {
         growthStage = 0; this.spriteName = null; type = Type.None;
     }
 }
-
-//TO DO: FIX PRESERVING TREES
