@@ -162,7 +162,7 @@ public class WorldHandler : MonoBehaviour {
         {
             for (int x = 0; x < size; x++)
             {
-                if (!(x >= size / 2 - safetySize / 2 && x <= size / 2 + safetySize / 2 - 1 && y >= size / 2 - safetySize / 2 && y <= size / 2 + safetySize / 2 - 1))
+                if (!IsPosInSafeZone(x, y))
                 {
                     float noiseValue = noiseMap[x, y];
                     noiseValue -= falloffMap[x, y];
@@ -185,7 +185,7 @@ public class WorldHandler : MonoBehaviour {
         {
             for (int x = 0; x < size; x++)
             {
-                if (!(x >= size / 2 - safetySize / 2 && x <= size / 2 + safetySize / 2 - 1 && y >= size / 2 - safetySize / 2 && y <= size / 2 + safetySize / 2 - 1))
+                if (!IsPosInSafeZone(x, y))
                 {
                     SoilCell cell = new() { position = (x, y) }; soilGrid[x, y] = cell;
                 }
@@ -197,7 +197,7 @@ public class WorldHandler : MonoBehaviour {
         {
             for (int x = 0; x < size; x++)
             {
-                if (!(x >= size / 2 - safetySize / 2 && x <= size / 2 + safetySize / 2 - 1 && y >= size / 2 - safetySize / 2 && y <= size / 2 + safetySize / 2 - 1))
+                if (!IsPosInSafeZone(x, y))
                 {
                     PlantCell cell = new() { position = (x, y) }; plantGrid[x, y] = cell;
                 }
@@ -479,7 +479,7 @@ public class WorldHandler : MonoBehaviour {
         //Delete All Trees Outside Safe Zone
         /*foreach (Vector3 treePosition in treePositions)
         {
-            if ((treePosition.x + size / 2 < size / 2 - safetySize / 2 && treePosition.x + size / 2 > size / 2 + safetySize / 2 - 1) && (treePosition.y + size / 2 < size / 2 - safetySize / 2 && treePosition.y + size / 2 > size / 2 + safetySize / 2 - 1)) {
+            if (IsPosInSafeZone(treePosition.x + size / 2, treePosition.y + size / 2))
                 foreach (Transform child in treeManager.transform)
                 {
                     if (child.position == treePosition) Destroy(child.gameObject);
@@ -523,7 +523,7 @@ public class WorldHandler : MonoBehaviour {
 
     public void AddSoilPlot(int x, int y) {
         if (soilGrid[x, y].IsType(SoilCell.Type.None)) {
-            soilTilemap.SetTile(new Vector3Int(x, y), soilPlotTiles[Random.Range(0,4)]);
+            soilTilemap.SetTile(new Vector3Int(x, y), soilPlotTiles[Random.Range(0, 4)]);
             soilGrid[x, y].type = SoilCell.Type.Soil;
         }
     }
@@ -553,16 +553,11 @@ public class WorldHandler : MonoBehaviour {
     public Vector3Int WorldPosToCellPos(Vector3 worldPos) {
         int cellPosX; if (worldPos.x >= 0) cellPosX = (int)worldPos.x; else cellPosX = (int)worldPos.x - 1;
         int cellPosY; if (worldPos.y >= 0) cellPosY = (int)worldPos.y; else cellPosY = (int)worldPos.y - 1;
-        return new(cellPosX + size/2, cellPosY + size/2, 0);
+        return new(cellPosX + size / 2, cellPosY + size / 2, 0);
     }
 
-    [ContextMenu("Debug All Ground Cells")]
-    public void DebugAllGroundCells()
-    {
-        foreach (GroundCell groundCell in groundGrid)
-        {
-            Debug.Log(groundCell.GetInfo());
-        }
+    public bool IsPosInSafeZone(int x, int y) {
+        return (x >= size / 2 - safetySize / 2 && x <= size / 2 + safetySize / 2 - 1 && y >= size / 2 - safetySize / 2 && y <= size / 2 + safetySize / 2 - 1);
     }
 }
 
@@ -600,12 +595,6 @@ public class Cell {
     public bool NearbyTileTypeDetected(Cell[,] grid, Type type, bool checkAllTiles = false) {
         if (checkAllTiles) return WorldHandler.CompareBoolArrays(NearbyTileTypes(grid, type), new bool[] { true, true, true, true, true, true, true, true });
         return !WorldHandler.CompareBoolArrays(NearbyTileTypes(grid, type), new bool[] { false, false, false, false, false, false, false, false });
-    }
-
-    public string GetInfo()
-    {
-        (int, int) pos = position; pos.Item1 -= 50; pos.Item2 -= 50;
-        return "Cell Position: " + pos.ToString() + "\nCell Type: " + type.ToString();
     }
 }
 
@@ -648,3 +637,5 @@ public class PlantCell : Cell {
         growthStage = 0; this.spriteName = null; type = Type.None;
     }
 }
+
+//TO DO: FIX PRESERVING TREES
