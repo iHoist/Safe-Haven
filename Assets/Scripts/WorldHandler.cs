@@ -4,13 +4,16 @@ using System.Collections.Generic;
 
 public class WorldHandler : MonoBehaviour {
     public static WorldHandler instance;
-    public int size = 100;
-    public int safetySize = 10;
-    public float scale = .1f;
+    private bool initialWorldGenerated = false;
 
     public GroundCell[,] groundGrid;
     public SoilCell[,] soilGrid;
     public PlantCell[,] plantGrid;
+
+    [Header("World Variables")]
+    public int size = 100;
+    public int safetySize = 10;
+    public float scale = .1f;
 
     [Header("Tree Variables")]
     public GameObject treeManager;
@@ -59,7 +62,6 @@ public class WorldHandler : MonoBehaviour {
     private void Start() {
         transform.position -= new Vector3(size / 2, size / 2);
         GenerateWorld();
-
     }
 
     private void Update() {
@@ -73,19 +75,13 @@ public class WorldHandler : MonoBehaviour {
         SmoothLandEdges();
         SetLandColliders();
         GenerateTrees();
-    }
 
-    [ContextMenu("Generate World Around Safe Zone")]
-    public void GenerateWorldAroundSafeZone() {
-        GenerateGridAroundSafeZone();
-        GenerateBasicTerrain();
-        SmoothLandEdges();
-        SetLandColliders();
-        GenerateTreesAroundSafeZone();
-
+        if (!initialWorldGenerated)
+            initialWorldGenerated = true;
     }
 
     private void GenerateGrid() {
+        //Creates Noise Map for GroundGrid
         float[,] noiseMap = new float[size, size];
         (float xOffset, float yOffset) = (Random.Range(-10000f, 10000f), Random.Range(-10000f, 10000f));
         for (int y = 0; y < size; y++) {
@@ -95,6 +91,7 @@ public class WorldHandler : MonoBehaviour {
             }
         }
 
+        //Creates Fall-off Map for GroundGrid
         float[,] falloffMap = new float[size, size];
         for (int y = 0; y < size; y++) {
             for (int x = 0; x < size; x++) {
@@ -105,75 +102,18 @@ public class WorldHandler : MonoBehaviour {
             }
         }
 
-        groundGrid = new GroundCell[size, size];
+        //Initializes GroundGrid
+        if (!initialWorldGenerated) groundGrid = new GroundCell[size, size];
         for (int y = 0; y < size; y++) {
             for (int x = 0; x < size; x++) {
-                float noiseValue = noiseMap[x, y];
-                noiseValue -= falloffMap[x, y];
-                GroundCell cell = new() { position = (x, y) };
-                if (noiseValue < waterLevel) cell.type = GroundCell.Type.Water;
-                groundGrid[x, y] = cell;
-            }
-        }
-
-        //Initializes SoilGrid
-        soilGrid = new SoilCell[size, size];
-        for (int y = 0; y < size; y++) {
-            for (int x = 0; x < size; x++) {
-                SoilCell cell = new() { position = (x, y) }; soilGrid[x, y] = cell;
-            }
-        }
-
-        //Initializes PlantGrid
-        plantGrid = new PlantCell[size, size];
-        for (int y = 0; y < size; y++) {
-            for (int x = 0; x < size; x++) {
-                PlantCell cell = new() { position = (x, y) }; plantGrid[x, y] = cell;
-            }
-        }
-    }
-
-    private void GenerateGridAroundSafeZone()
-    {
-        float[,] noiseMap = new float[size, size];
-        (float xOffset, float yOffset) = (Random.Range(-10000f, 10000f), Random.Range(-10000f, 10000f));
-        for (int y = 0; y < size; y++)
-        {
-            for (int x = 0; x < size; x++)
-            {
-                float noiseValue = Mathf.PerlinNoise(x * scale + xOffset, y * scale + yOffset);
-                noiseMap[x, y] = noiseValue;
-            }
-        }
-
-        float[,] falloffMap = new float[size, size];
-        for (int y = 0; y < size; y++)
-        {
-            for (int x = 0; x < size; x++)
-            {
-                float xv = x / (float)size * 2 - 1;
-                float yv = y / (float)size * 2 - 1;
-                float v = Mathf.Max(Mathf.Abs(xv), Mathf.Abs(yv));
-                falloffMap[x, y] = Mathf.Pow(v, 3f) / (Mathf.Pow(v, 3f) + Mathf.Pow(2.2f - 2.2f * v, 3f));
-            }
-        }
-
-        for (int y = 0; y < size; y++)
-        {
-            for (int x = 0; x < size; x++)
-            {
-                if (!IsPosInSafeZone(x, y))
-                {
+                if (!IsPosInSafeZone(x, y) || !initialWorldGenerated) {
                     float noiseValue = noiseMap[x, y];
                     noiseValue -= falloffMap[x, y];
                     GroundCell cell = new() { position = (x, y) };
                     if (noiseValue < waterLevel) cell.type = GroundCell.Type.Water;
                     groundGrid[x, y] = cell;
-                }
-                else
-                {
-                    if (!groundGrid[x, y].IsType(GroundCell.Type.Water))
-                    {
+                } else {
+                    if (!groundGrid[x, y].IsType(GroundCell.Type.Water)) {
                         groundGrid[x, y].type = GroundCell.Type.Land;
                     }
                 }
@@ -181,24 +121,20 @@ public class WorldHandler : MonoBehaviour {
         }
 
         //Initializes SoilGrid
-        for (int y = 0; y < size; y++)
-        {
-            for (int x = 0; x < size; x++)
-            {
-                if (!IsPosInSafeZone(x, y))
-                {
+        if (!initialWorldGenerated) soilGrid = new SoilCell[size, size];
+        for (int y = 0; y < size; y++) {
+            for (int x = 0; x < size; x++) {
+                if (!IsPosInSafeZone(x, y) || !initialWorldGenerated) {
                     SoilCell cell = new() { position = (x, y) }; soilGrid[x, y] = cell;
                 }
             }
         }
 
         //Initializes PlantGrid
-        for (int y = 0; y < size; y++)
-        {
-            for (int x = 0; x < size; x++)
-            {
-                if (!IsPosInSafeZone(x, y))
-                {
+        if (!initialWorldGenerated) plantGrid = new PlantCell[size, size];
+        for (int y = 0; y < size; y++) {
+            for (int x = 0; x < size; x++) {
+                if (!IsPosInSafeZone(x, y) || !initialWorldGenerated) {
                     PlantCell cell = new() { position = (x, y) }; plantGrid[x, y] = cell;
                 }
             }
@@ -415,60 +351,6 @@ public class WorldHandler : MonoBehaviour {
         //Creates a Noise Map for New Trees
         float[,] noiseMap = new float[size, size];
         (float xOffset, float yOffset) = (Random.Range(-10000f, 10000f), Random.Range(-10000f, 10000f));
-        for (int y = 0; y < size; y++)
-        {
-            for (int x = 0; x < size; x++)
-            {
-                float noiseValue = Mathf.PerlinNoise(x * treeNoiseScale + xOffset, y * treeNoiseScale + yOffset);
-                noiseMap[x, y] = noiseValue;
-            }
-        }
-
-        //Destroys All Previous Trees
-        foreach (Transform child in treeManager.transform)
-        {
-            Destroy(child.gameObject);
-        }
-
-        //Initializes New Trees
-        for (int y = 1; y < size - 1; y++)
-        {
-            for (int x = 1; x < size - 1; x++)
-            {
-                GroundCell cell = groundGrid[x, y];
-                if (cell.IsType(GroundCell.Type.Land) && cell.NearbyTileTypeDetected(groundGrid, GroundCell.Type.Land, true))
-                {
-                    float v = Random.Range(0f, treeDensity);
-                    if (noiseMap[x, y] < v)
-                    {
-                        bool collidingWithTree = false;
-                        foreach (Vector3 treePosition in treePositions)
-                        {
-                            if (treePosition.x > x - size / 2 - 2 && treePosition.x < x - size / 2 + 2 && treePosition.y > y - size / 2 - 2 && treePosition.y < y - size / 2 + 2)
-                            {
-                                collidingWithTree = true;
-                                break;
-                            }
-                        }
-                        if (collidingWithTree) continue;
-
-                        GameObject prefab = treePrefabs[Random.Range(0, treePrefabs.Length)];
-                        GameObject tree = Instantiate(prefab, treeManager.transform);
-                        tree.transform.position = new(x - size / 2, y - size / 2, 0);
-                        treePositions.Add(tree.transform.position);
-                    }
-                }
-            }
-        }
-
-        //Adjusts Position of New Trees
-        foreach (Transform tree in treeManager.transform) tree.position += new Vector3(0.5f, 1f, 0f);
-    }
-
-    private void GenerateTreesAroundSafeZone() {
-        //Creates a Noise Map for New Trees
-        float[,] noiseMap = new float[size, size];
-        (float xOffset, float yOffset) = (Random.Range(-10000f, 10000f), Random.Range(-10000f, 10000f));
         for (int y = 0; y < size; y++) {
             for (int x = 0; x < size; x++) {
                 float noiseValue = Mathf.PerlinNoise(x * treeNoiseScale + xOffset, y * treeNoiseScale + yOffset);
@@ -476,40 +358,26 @@ public class WorldHandler : MonoBehaviour {
             }
         }
 
-        //Destroys All Previous Trees
-        foreach (Transform child in treeManager.transform)
-        {
-            Destroy(child.gameObject);
-        }
-
-        //Delete All Trees Outside Safe Zone
-        /*foreach (Vector3 treePosition in treePositions)
-        {
-            if (IsPosInSafeZone(treePosition.x + size / 2, treePosition.y + size / 2))
-                foreach (Transform child in treeManager.transform)
-                {
-                    if (child.position == treePosition) Destroy(child.gameObject);
-                }
+        //Destroys All Trees Outside Safe Zone
+        foreach (Transform tree in treeManager.transform) {
+            if (initialWorldGenerated && !IsPosInSafeZone(tree.position.x + (size / 2) - 0.5f, tree.position.y + (size / 2) - 1f)) {
+                Destroy(tree.gameObject);
+                treePositions.Remove(tree.transform.position -= new Vector3(0.5f, 1f, 0f));
             }
-        }*/
+        }
 
         //Initializes New Trees
         for (int y = 1; y < size - 1; y++) {
             for (int x = 1; x < size - 1; x++) {
-                if ((x < 45 || x > 54) && (y < 45 || y > 54)) {
+                if (!IsPosInSafeZone(x, y) || !initialWorldGenerated) {
                     GroundCell cell = groundGrid[x, y];
-                    if (cell.IsType(GroundCell.Type.Land) && cell.NearbyTileTypeDetected(groundGrid, GroundCell.Type.Land, true))
-                    {
+                    if (cell.IsType(GroundCell.Type.Land) && cell.NearbyTileTypeDetected(groundGrid, GroundCell.Type.Land, true)) {
                         float v = Random.Range(0f, treeDensity);
-                        if (noiseMap[x, y] < v)
-                        {
+                        if (noiseMap[x, y] < v) {
                             bool collidingWithTree = false;
-                            foreach (Vector3 treePosition in treePositions)
-                            {
-                                if (treePosition.x > x - size / 2 - 2 && treePosition.x < x - size / 2 + 2 && treePosition.y > y - size / 2 - 2 && treePosition.y < y - size / 2 + 2)
-                                {
-                                    collidingWithTree = true;
-                                    break;
+                            foreach (Vector3 treePosition in treePositions) {
+                                if (treePosition.x > x - size / 2 - 2 && treePosition.x < x - size / 2 + 2 && treePosition.y > y - size / 2 - 2 && treePosition.y < y - size / 2 + 2) {
+                                    collidingWithTree = true; break;
                                 }
                             }
                             if (collidingWithTree) continue;
@@ -525,7 +393,10 @@ public class WorldHandler : MonoBehaviour {
         }
 
         //Adjusts Position of New Trees
-        foreach (Transform tree in treeManager.transform) tree.position += new Vector3(0.5f, 1f, 0f);
+        foreach (Transform tree in treeManager.transform) {
+            if (!IsPosInSafeZone(tree.position.x + (size / 2), tree.position.y + (size / 2)) || !initialWorldGenerated)
+                tree.position += new Vector3(0.5f, 1f, 0f);
+        }
     }
 
     public void AddSoilPlot(int x, int y) {
@@ -563,7 +434,7 @@ public class WorldHandler : MonoBehaviour {
         return new(cellPosX + size / 2, cellPosY + size / 2, 0);
     }
 
-    public bool IsPosInSafeZone(int x, int y) {
+    public bool IsPosInSafeZone(float x, float y) {
         return (x >= size / 2 - safetySize / 2 && x <= size / 2 + safetySize / 2 - 1 && y >= size / 2 - safetySize / 2 && y <= size / 2 + safetySize / 2 - 1);
     }
 }
