@@ -18,7 +18,7 @@ public class WorldHandler : MonoBehaviour {
     [Header("Tree Variables")]
     public GameObject treeManager;
     public GameObject[] treePrefabs;
-    private List<Vector3> treePositions = new();
+    private readonly List<Vector3> treePositions = new();
     public float treeNoiseScale = .05f;
     public float treeDensity = .5f;
 
@@ -62,6 +62,7 @@ public class WorldHandler : MonoBehaviour {
     private void Start() {
         transform.position -= new Vector3(size / 2, size / 2);
         GenerateWorld();
+        initialWorldGenerated = true;
     }
 
     private void Update() {
@@ -75,9 +76,6 @@ public class WorldHandler : MonoBehaviour {
         SmoothLandEdges();
         SetLandColliders();
         GenerateTrees();
-
-        if (!initialWorldGenerated)
-            initialWorldGenerated = true;
     }
 
     private void GenerateGrid() {
@@ -396,6 +394,15 @@ public class WorldHandler : MonoBehaviour {
         foreach (Transform tree in treeManager.transform) {
             if (!IsPosInSafeZone(tree.position.x + (size / 2), tree.position.y + (size / 2)) || !initialWorldGenerated)
                 tree.position += new Vector3(0.5f, 1f, 0f);
+        }
+
+        //Destroys All Trees Not On Stable Land
+        foreach (Transform tree in treeManager.transform) {
+            GroundCell cell = groundGrid[(int)(tree.position.x + size / 2 - 0.5f), (int)(tree.position.y + size / 2 - 1f)];
+            if (!cell.IsType(GroundCell.Type.Land) || !cell.NearbyTileTypeDetected(groundGrid, GroundCell.Type.Land, true)) {
+                Destroy(tree.gameObject);
+                treePositions.Remove(tree.transform.position -= new Vector3(0.5f, 1f, 0f));
+            }
         }
     }
 
