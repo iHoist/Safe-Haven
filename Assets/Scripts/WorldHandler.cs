@@ -148,7 +148,6 @@ public class WorldHandler : MonoBehaviour {
     }
 
     private void SmoothLandEdges() {
-        DisplayGridTypes(groundGrid, "Initial");
         bool landFound;
         while (true) {
             //Creates Corners
@@ -178,7 +177,6 @@ public class WorldHandler : MonoBehaviour {
                     }
                 }
             }
-            DisplayGridTypes(groundGrid, "After Corners");
 
             //Creates Inverse Corners
             for (int y = 1; y < size - 1; y++) {
@@ -195,7 +193,6 @@ public class WorldHandler : MonoBehaviour {
                     }
                 }
             }
-            DisplayGridTypes(groundGrid, "After Inverse Corners");
 
             //Creates Edges
             for (int y = 1; y < size - 1; y++) {
@@ -212,7 +209,6 @@ public class WorldHandler : MonoBehaviour {
                     }
                 }
             }
-            DisplayGridTypes(groundGrid, "After Edges");
 
             //Creates Double Corners
             for (int y = 1; y < size - 1; y++) {
@@ -224,9 +220,8 @@ public class WorldHandler : MonoBehaviour {
                             groundTilemap.SetTile(new Vector3Int(x, y), lowerLeftAndUpperRightCornerTile); groundGrid[x, y].type = GroundCell.Type.LowerLeftAndUpperRightCorner; }
                 }
             }
-            DisplayGridTypes(groundGrid, "After Double Corners");
 
-            //Removes Protruding Land Stumps (And Smooths Again if Needed)
+            //Removes Protruding Land Stumps + Other Detected Land Issues (And Smooths Again if Needed)
             landFound = false;
             for (int y = 1; y < size - 1; y++) {
                 for (int x = 1; x < size - 1; x++) {
@@ -271,19 +266,19 @@ public class WorldHandler : MonoBehaviour {
                 }
             }
             if (landFound) continue;
-            DisplayGridTypes(groundGrid, "After Land Protrustions");
 
-            //Removes Any Remaining Land Exposed To Water
+            //Removes Any Remaining Land Exposed To Water (And Smooths Again if Needed)
+            landFound = false;
             for (int y = 1; y < size - 1; y++) {
                 for (int x = 1; x < size - 1; x++) {
                     if (groundGrid[x, y].IsType(GroundCell.Type.Land) && groundGrid[x, y].NearbyTileTypeDetected(groundGrid, GroundCell.Type.Water)) {
                         groundTilemap.SetTile(new Vector3Int(x, y), waterTile); groundGrid[x, y].type = GroundCell.Type.Water; landFound = true;
-                    }
-                }
+                    } if (landFound) break;
+                } if (landFound) break;
             }
-            DisplayGridTypes(groundGrid, "After Final Land Purge");
+            if (landFound) continue;
 
-            //Resets All Disconnected Edges And Corners
+            //Resets All Disconnected Edges And Corners (And Smooths Again if Needed)
             landFound = false;
             for (int y = 1; y < size - 1; y++) {
                 for (int x = 1; x < size - 1; x++) {
@@ -332,7 +327,6 @@ public class WorldHandler : MonoBehaviour {
                 }
             }
             if (landFound) continue;
-            DisplayGridTypes(groundGrid, "After Disconnection Check");
 
             //Fixes "Inverse Edge Connections"
             for (int y = 1; y < size - 1; y++) {
@@ -347,11 +341,9 @@ public class WorldHandler : MonoBehaviour {
                         groundGrid[x, y].type = GroundCell.Type.UpperRightCorner; groundTilemap.SetTile(new Vector3Int(x, y), upperRightCornerTile); groundGrid[x, y + 1].type = GroundCell.Type.LowerLeftCorner; groundTilemap.SetTile(new Vector3Int(x, y + 1), lowerLeftCornerTile); }
                 }
             }
-            DisplayGridTypes(groundGrid, "After Inverse Edge Fix");
 
             break;
         }
-        DisplayGridTypes(groundGrid, "Final");
     }
 
     private void SetLandColliders() {
