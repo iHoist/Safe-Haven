@@ -110,10 +110,8 @@ public class WorldHandler : MonoBehaviour {
                     GroundCell cell = new() { position = (x, y) };
                     if (noiseValue < waterLevel) cell.type = GroundCell.Type.Water;
                     groundGrid[x, y] = cell;
-                } else {
-                    if (!groundGrid[x, y].IsType(GroundCell.Type.Water)) {
-                        groundGrid[x, y].type = GroundCell.Type.Land;
-                    }
+                } else if (!groundGrid[x, y].IsType(GroundCell.Type.Water)) {
+                    groundGrid[x, y].type = GroundCell.Type.Land;
                 }
             }
         }
@@ -150,6 +148,8 @@ public class WorldHandler : MonoBehaviour {
     }
 
     private void SmoothLandEdges() {
+        DisplayGridTypes(groundGrid);
+        bool landFound;
         while (true) {
             //Creates Corners
             for (int y = 1; y < size - 1; y++) {
@@ -223,46 +223,48 @@ public class WorldHandler : MonoBehaviour {
             }
 
             //Removes Protruding Land Stumps (And Smooths Again if Needed) [UNFINISHED]
-            bool landFound = false;
+            landFound = false;
             for (int y = 1; y < size - 1; y++) {
                 for (int x = 1; x < size - 1; x++) {
-                    if (groundGrid[x, y].IsType(GroundCell.Type.Land))
+                    if (groundGrid[x, y].IsType(GroundCell.Type.Land)) {
                         if (CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, true, true, true, false, false, false }) ||
                             CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { false, true, true, false, true, false, true, true }) ||
                             CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { false, false, false, true, true, true, true, true }) ||
                             CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, false, true, false, true, true, false })) {
-                            groundTilemap.SetTile(new Vector3Int(x, y), waterTile); groundGrid[x, y].type = GroundCell.Type.Water; landFound = true; }
-                        else if (CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, true, true, true, true, false, false }) ||
-                            CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, true, false, true, false, true, true }) ||
-                            CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, false, false, true, true, true, true, true }) ||
-                            CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, true, true, false, true, true, false })) {
-                            groundTilemap.SetTile(new Vector3Int(x, y), waterTile); groundGrid[x, y].type = GroundCell.Type.Water; landFound = true; }
-                        else if (CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, true, true, true, false, false, true }) ||
-                            CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { false, true, true, false, true, true, true, true }) ||
-                            CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { false, false, true, true, true, true, true, true }) ||
-                            CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, false, true, false, true, true, true })) {
-                            groundTilemap.SetTile(new Vector3Int(x, y), waterTile); groundGrid[x, y].type = GroundCell.Type.Water; landFound = true; }
-                        else if (CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, true, true, true, true, false, true }) ||
-                            CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, true, false, true, true, true, true }) ||
-                            CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, false, true, true, true, true, true, true }) ||
-                            CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, true, true, false, true, true, true })) {
-                            groundTilemap.SetTile(new Vector3Int(x, y), waterTile); groundGrid[x, y].type = GroundCell.Type.Water; landFound = true; }
-                        else if (CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, false, false, false, false, false, false, true }) ||
-                            CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { false, false, true, false, false, true, false, false })) {
-                            groundTilemap.SetTile(new Vector3Int(x, y), waterTile); groundGrid[x, y].type = GroundCell.Type.Water; landFound = true; }
+                            groundTilemap.SetTile(new Vector3Int(x, y), waterTile); groundGrid[x, y].type = GroundCell.Type.Water; landFound = true;
+                        } else if (CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, true, true, true, true, false, false }) ||
+                              CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, true, false, true, false, true, true }) ||
+                              CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, false, false, true, true, true, true, true }) ||
+                              CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, true, true, false, true, true, false })) {
+                            groundTilemap.SetTile(new Vector3Int(x, y), waterTile); groundGrid[x, y].type = GroundCell.Type.Water; landFound = true;
+                        } else if (CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, true, true, true, false, false, true }) ||
+                              CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { false, true, true, false, true, true, true, true }) ||
+                              CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { false, false, true, true, true, true, true, true }) ||
+                              CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, false, true, false, true, true, true })) {
+                            groundTilemap.SetTile(new Vector3Int(x, y), waterTile); groundGrid[x, y].type = GroundCell.Type.Water; landFound = true;
+                        } else if (CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, true, true, true, true, false, true }) ||
+                              CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, true, false, true, true, true, true }) ||
+                              CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, false, true, true, true, true, true, true }) ||
+                              CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, true, true, false, true, true, true })) {
+                            groundTilemap.SetTile(new Vector3Int(x, y), waterTile); groundGrid[x, y].type = GroundCell.Type.Water; landFound = true;
+                        } else if (CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, false, false, false, false, false, false, true }) ||
+                              CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { false, false, true, false, false, true, false, false })) {
+                            groundTilemap.SetTile(new Vector3Int(x, y), waterTile); groundGrid[x, y].type = GroundCell.Type.Water; landFound = true;
+                        }
+                    }
                 }
             }
             if (landFound) continue;
 
             //Removes Any Land Pieces Still Exposed to Water
-            landFound = false;
+            /*landFound = false;
             for (int y = 1; y < size - 1; y++) {
                 for (int x = 1; x < size - 1; x++) {
                     if (groundGrid[x, y].IsType(GroundCell.Type.Land) && groundGrid[x, y].NearbyTileTypeDetected(groundGrid, GroundCell.Type.Water)) {
                         groundTilemap.SetTile(new Vector3Int(x, y), waterTile); groundGrid[x, y].type = GroundCell.Type.Water; landFound = true; }
                 }
             }
-            if (landFound) continue;
+            if (landFound) continue;*/
 
             //Resets All Disconnected Edges And Corners
             landFound = false;
@@ -443,6 +445,15 @@ public class WorldHandler : MonoBehaviour {
 
     public bool IsPosInSafeZone(float x, float y) {
         return (x >= size / 2 - safetySize / 2 && x <= size / 2 + safetySize / 2 - 1 && y >= size / 2 - safetySize / 2 && y <= size / 2 + safetySize / 2 - 1);
+    }
+
+    private void DisplayGridTypes(Cell[,] grid) {
+        for (int y = 1; y < size - 1; y++) {
+            for (int x = 1; x < size - 1; x++) {
+                Cell cell = grid[x, y];
+                Debug.Log("(" + x + ", " + y + ") - " + cell.type + "\n");
+            }
+        }
     }
 }
 
