@@ -148,7 +148,7 @@ public class WorldHandler : MonoBehaviour {
     }
 
     private void SmoothLandEdges() {
-        DisplayGridTypes(groundGrid);
+        DisplayGridTypes(groundGrid, "Initial");
         bool landFound;
         while (true) {
             //Creates Corners
@@ -178,6 +178,7 @@ public class WorldHandler : MonoBehaviour {
                     }
                 }
             }
+            DisplayGridTypes(groundGrid, "After Corners");
 
             //Creates Inverse Corners
             for (int y = 1; y < size - 1; y++) {
@@ -194,6 +195,7 @@ public class WorldHandler : MonoBehaviour {
                     }
                 }
             }
+            DisplayGridTypes(groundGrid, "After Inverse Corners");
 
             //Creates Edges
             for (int y = 1; y < size - 1; y++) {
@@ -210,6 +212,7 @@ public class WorldHandler : MonoBehaviour {
                     }
                 }
             }
+            DisplayGridTypes(groundGrid, "After Edges");
 
             //Creates Double Corners
             for (int y = 1; y < size - 1; y++) {
@@ -221,8 +224,9 @@ public class WorldHandler : MonoBehaviour {
                             groundTilemap.SetTile(new Vector3Int(x, y), lowerLeftAndUpperRightCornerTile); groundGrid[x, y].type = GroundCell.Type.LowerLeftAndUpperRightCorner; }
                 }
             }
+            DisplayGridTypes(groundGrid, "After Double Corners");
 
-            //Removes Protruding Land Stumps (And Smooths Again if Needed) [UNFINISHED]
+            //Removes Protruding Land Stumps (And Smooths Again if Needed)
             landFound = false;
             for (int y = 1; y < size - 1; y++) {
                 for (int x = 1; x < size - 1; x++) {
@@ -233,38 +237,51 @@ public class WorldHandler : MonoBehaviour {
                             CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, false, true, false, true, true, false })) {
                             groundTilemap.SetTile(new Vector3Int(x, y), waterTile); groundGrid[x, y].type = GroundCell.Type.Water; landFound = true;
                         } else if (CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, true, true, true, true, false, false }) ||
-                              CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, true, false, true, false, true, true }) ||
-                              CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, false, false, true, true, true, true, true }) ||
-                              CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, true, true, false, true, true, false })) {
+                            CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, true, false, true, false, true, true }) ||
+                            CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, false, false, true, true, true, true, true }) ||
+                            CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, true, true, false, true, true, false })) {
                             groundTilemap.SetTile(new Vector3Int(x, y), waterTile); groundGrid[x, y].type = GroundCell.Type.Water; landFound = true;
                         } else if (CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, true, true, true, false, false, true }) ||
-                              CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { false, true, true, false, true, true, true, true }) ||
-                              CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { false, false, true, true, true, true, true, true }) ||
-                              CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, false, true, false, true, true, true })) {
+                            CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { false, true, true, false, true, true, true, true }) ||
+                            CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { false, false, true, true, true, true, true, true }) ||
+                            CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, false, true, false, true, true, true })) {
                             groundTilemap.SetTile(new Vector3Int(x, y), waterTile); groundGrid[x, y].type = GroundCell.Type.Water; landFound = true;
                         } else if (CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, true, true, true, true, false, true }) ||
-                              CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, true, false, true, true, true, true }) ||
-                              CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, false, true, true, true, true, true, true }) ||
-                              CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, true, true, false, true, true, true })) {
+                            CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, true, false, true, true, true, true }) ||
+                            CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, false, true, true, true, true, true, true }) ||
+                            CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, true, true, false, true, true, true })) {
                             groundTilemap.SetTile(new Vector3Int(x, y), waterTile); groundGrid[x, y].type = GroundCell.Type.Water; landFound = true;
                         } else if (CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, false, false, false, false, false, false, true }) ||
-                              CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { false, false, true, false, false, true, false, false })) {
+                            CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { false, false, true, false, false, true, false, false })) {
+                            groundTilemap.SetTile(new Vector3Int(x, y), waterTile); groundGrid[x, y].type = GroundCell.Type.Water; landFound = true;
+                        }
+
+                        else if (CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { false, false, true, true, true, true, false, false }) ||
+                            CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, false, false, true, true, false, false, true }) ||
+                            CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { false, true, true, false, false, true, true, false }) ||
+                            CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { true, true, false, false, false, false, true, true })) {
+                            groundTilemap.SetTile(new Vector3Int(x, y), waterTile); groundGrid[x, y].type = GroundCell.Type.Water; landFound = true;
+                        } else if (CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { false, false, false, true, true, false, false, false }) ||
+                            CompareBoolArrays(groundGrid[x, y].NearbyTileTypes(groundGrid, GroundCell.Type.Water), new bool[] { false, true, false, false, false, false, true, true })) {
+                            groundTilemap.SetTile(new Vector3Int(x, y), waterTile); groundGrid[x, y].type = GroundCell.Type.Water; landFound = true;
+                        } else if (groundGrid[x, y].NearbyTileTypeDetected(groundGrid, GroundCell.Type.Water, true)) {
                             groundTilemap.SetTile(new Vector3Int(x, y), waterTile); groundGrid[x, y].type = GroundCell.Type.Water; landFound = true;
                         }
                     }
                 }
             }
             if (landFound) continue;
+            DisplayGridTypes(groundGrid, "After Land Protrustions");
 
-            //Removes Any Land Pieces Still Exposed to Water
-            /*landFound = false;
+            //Removes Any Remaining Land Exposed To Water
             for (int y = 1; y < size - 1; y++) {
                 for (int x = 1; x < size - 1; x++) {
                     if (groundGrid[x, y].IsType(GroundCell.Type.Land) && groundGrid[x, y].NearbyTileTypeDetected(groundGrid, GroundCell.Type.Water)) {
-                        groundTilemap.SetTile(new Vector3Int(x, y), waterTile); groundGrid[x, y].type = GroundCell.Type.Water; landFound = true; }
+                        groundTilemap.SetTile(new Vector3Int(x, y), waterTile); groundGrid[x, y].type = GroundCell.Type.Water; landFound = true;
+                    }
                 }
             }
-            if (landFound) continue;*/
+            DisplayGridTypes(groundGrid, "After Final Land Purge");
 
             //Resets All Disconnected Edges And Corners
             landFound = false;
@@ -315,6 +332,7 @@ public class WorldHandler : MonoBehaviour {
                 }
             }
             if (landFound) continue;
+            DisplayGridTypes(groundGrid, "After Disconnection Check");
 
             //Fixes "Inverse Edge Connections"
             for (int y = 1; y < size - 1; y++) {
@@ -329,15 +347,17 @@ public class WorldHandler : MonoBehaviour {
                         groundGrid[x, y].type = GroundCell.Type.UpperRightCorner; groundTilemap.SetTile(new Vector3Int(x, y), upperRightCornerTile); groundGrid[x, y + 1].type = GroundCell.Type.LowerLeftCorner; groundTilemap.SetTile(new Vector3Int(x, y + 1), lowerLeftCornerTile); }
                 }
             }
+            DisplayGridTypes(groundGrid, "After Inverse Edge Fix");
 
             break;
         }
+        DisplayGridTypes(groundGrid, "Final");
     }
 
     private void SetLandColliders() {
         for (int x = 0; x < size; x++) {
             for (int y = 0; y < size; y++) {
-                Tilemap tilemap = transform.GetChild(0).GetComponent<Tilemap>();
+                Tilemap tilemap = transform.GetChild(1).GetChild(0).GetComponent<Tilemap>();
                 switch (groundGrid[x, y].type) {
                     case GroundCell.Type.Land: tilemap.SetColliderType(new Vector3Int(x, y), Tile.ColliderType.None); break;
                     case GroundCell.Type.Water: tilemap.SetColliderType(new Vector3Int(x, y), Tile.ColliderType.None); break;
@@ -447,13 +467,8 @@ public class WorldHandler : MonoBehaviour {
         return (x >= size / 2 - safetySize / 2 && x <= size / 2 + safetySize / 2 - 1 && y >= size / 2 - safetySize / 2 && y <= size / 2 + safetySize / 2 - 1);
     }
 
-    private void DisplayGridTypes(Cell[,] grid) {
-        for (int y = 1; y < size - 1; y++) {
-            for (int x = 1; x < size - 1; x++) {
-                Cell cell = grid[x, y];
-                Debug.Log("(" + x + ", " + y + ") - " + cell.type + "\n");
-            }
-        }
+    private void DisplayGridTypes(Cell[,] grid, string header = "") {
+        Debug.Log(header + " (" + 50 + ", " + 50 + ") - " + grid[50, 50].type + " - (" + 70 + ", " + 70 + ") - " + grid[70, 70].type + "\n");
     }
 }
 
