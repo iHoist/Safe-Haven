@@ -4,8 +4,9 @@ using System.Collections.Generic;
 
 [CreateAssetMenu()]
 public class RecipeSO : ScriptableObject {
-    public List<ItemSOWithQuantity> itemList;
     public string recipeName;
+    public ItemSO craftedItem;
+    public List<ItemSOWithQuantity> itemList;
 
     [Serializable]
     public class ItemSOWithQuantity {

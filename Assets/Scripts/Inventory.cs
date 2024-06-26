@@ -23,9 +23,9 @@ public class Inventory {
         public bool CanAddItem() { return count < maxCount; }
 
         public void AddItem(Collectable item) {
-            this.itemSO = item.itemSO;
-            this.type = item.type;
-            this.icon = item.icon;
+            itemSO = item.itemSO;
+            type = item.type;
+            icon = item.icon;
             count++;
         }
 
