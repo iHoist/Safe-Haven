@@ -8,13 +8,18 @@ public class CraftableItem : MonoBehaviour {
     public void SelectItem() {
         if (recipeSO) {
             UpdateIngredientsText();
+            UpdateSelectedRecipe();
         }
     }
 
     private void UpdateIngredientsText() {
         string ingredientsText = "Ingredients:";
-        for (int i = 0; i < recipeSO.itemList.ToArray().Length; i++)
-            ingredientsText += "\n" + recipeSO.itemList[i].itemSO.name + " (" + recipeSO.itemList[i].quantity + ")";
+        for (int i = 0; i < recipeSO.ingredientsList.ToArray().Length; i++)
+            ingredientsText += "\n" + recipeSO.ingredientsList[i].itemSO.name + " (" + recipeSO.ingredientsList[i].quantity + ")";
         CraftingManager.instance.ingredientsText.text = ingredientsText;
+    }
+
+    private void UpdateSelectedRecipe() {
+        CraftingManager.instance.selectedRecipe = recipeSO;
     }
 }

@@ -27,13 +27,19 @@ public class PlayerHandler : MonoBehaviour {
         inputActions.Enable();
     }
     private void Update() {
-        direction = inputActions.Player.Move.ReadValue<Vector2>(); AnimateMvoement(direction);
-        isInteracting = !(animator.GetCurrentAnimatorStateInfo(0).IsName("Idle") || animator.GetCurrentAnimatorStateInfo(0).IsName("Run"));
-        UpdateActionVariables();
+        if (inputActions.Player.ToggleMenu.WasPressedThisFrame()) CraftingManager.instance.ToggleCraftingMenu();
 
-        if (inputActions.Player.DropItem.WasPressedThisFrame()) DropItem();
-        if (inputActions.Player.Interact.WasPressedThisFrame()) Interact();
-        if (inputActions.Player.Place.WasPressedThisFrame()) Place();
+        if (!CraftingManager.instance.menuOn) {
+            direction = inputActions.Player.Move.ReadValue<Vector2>(); AnimateMvoement(direction);
+            isInteracting = !(animator.GetCurrentAnimatorStateInfo(0).IsName("Idle") || animator.GetCurrentAnimatorStateInfo(0).IsName("Run"));
+            UpdateActionVariables();
+
+            if (inputActions.Player.DropItem.WasPressedThisFrame()) DropItem();
+            if (inputActions.Player.Interact.WasPressedThisFrame()) Interact();
+            if (inputActions.Player.Place.WasPressedThisFrame()) Place();
+        } else {
+            direction = new(); AnimateMvoement(direction);
+        }
     }
     private void FixedUpdate() {
         GetComponent<Rigidbody2D>().velocity = direction * speed;

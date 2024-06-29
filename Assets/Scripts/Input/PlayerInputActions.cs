@@ -80,6 +80,15 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Toggle Menu"",
+                    ""type"": ""Button"",
+                    ""id"": ""a67881c5-a1a3-4aea-960c-498748cfeaf8"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -243,7 +252,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/1"",
                     ""interactions"": """",
                     ""processors"": ""Scale"",
-                    ""groups"": """",
+                    ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""NumKeys"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -254,7 +263,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/2"",
                     ""interactions"": """",
                     ""processors"": ""Scale(factor=2)"",
-                    ""groups"": """",
+                    ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""NumKeys"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -265,7 +274,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/3"",
                     ""interactions"": """",
                     ""processors"": ""Scale(factor=3)"",
-                    ""groups"": """",
+                    ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""NumKeys"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -276,7 +285,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/4"",
                     ""interactions"": """",
                     ""processors"": ""Scale(factor=4)"",
-                    ""groups"": """",
+                    ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""NumKeys"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -287,7 +296,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/5"",
                     ""interactions"": """",
                     ""processors"": ""Scale(factor=5)"",
-                    ""groups"": """",
+                    ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""NumKeys"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -298,7 +307,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/6"",
                     ""interactions"": """",
                     ""processors"": ""Scale(factor=6)"",
-                    ""groups"": """",
+                    ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""NumKeys"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -309,7 +318,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/7"",
                     ""interactions"": """",
                     ""processors"": ""Scale(factor=7)"",
-                    ""groups"": """",
+                    ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""NumKeys"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -320,7 +329,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/8"",
                     ""interactions"": """",
                     ""processors"": ""Scale(factor=8)"",
-                    ""groups"": """",
+                    ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""NumKeys"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -331,7 +340,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""path"": ""<Keyboard>/9"",
                     ""interactions"": """",
                     ""processors"": ""Scale(factor=9)"",
-                    ""groups"": """",
+                    ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""NumKeys"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -355,6 +364,17 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""Place"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""47a5fbd4-147b-433f-980c-343b05cd93fd"",
+                    ""path"": ""<Keyboard>/i"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Toggle Menu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -948,6 +968,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Player_DropItem = m_Player.FindAction("Drop Item", throwIfNotFound: true);
         m_Player_Place = m_Player.FindAction("Place", throwIfNotFound: true);
         m_Player_NumKeys = m_Player.FindAction("NumKeys", throwIfNotFound: true);
+        m_Player_ToggleMenu = m_Player.FindAction("Toggle Menu", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1027,6 +1048,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_DropItem;
     private readonly InputAction m_Player_Place;
     private readonly InputAction m_Player_NumKeys;
+    private readonly InputAction m_Player_ToggleMenu;
     public struct PlayerActions
     {
         private @PlayerInputActions m_Wrapper;
@@ -1037,6 +1059,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         public InputAction @DropItem => m_Wrapper.m_Player_DropItem;
         public InputAction @Place => m_Wrapper.m_Player_Place;
         public InputAction @NumKeys => m_Wrapper.m_Player_NumKeys;
+        public InputAction @ToggleMenu => m_Wrapper.m_Player_ToggleMenu;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -1064,6 +1087,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @NumKeys.started += instance.OnNumKeys;
             @NumKeys.performed += instance.OnNumKeys;
             @NumKeys.canceled += instance.OnNumKeys;
+            @ToggleMenu.started += instance.OnToggleMenu;
+            @ToggleMenu.performed += instance.OnToggleMenu;
+            @ToggleMenu.canceled += instance.OnToggleMenu;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -1086,6 +1112,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @NumKeys.started -= instance.OnNumKeys;
             @NumKeys.performed -= instance.OnNumKeys;
             @NumKeys.canceled -= instance.OnNumKeys;
+            @ToggleMenu.started -= instance.OnToggleMenu;
+            @ToggleMenu.performed -= instance.OnToggleMenu;
+            @ToggleMenu.canceled -= instance.OnToggleMenu;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -1274,6 +1303,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         void OnDropItem(InputAction.CallbackContext context);
         void OnPlace(InputAction.CallbackContext context);
         void OnNumKeys(InputAction.CallbackContext context);
+        void OnToggleMenu(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {
